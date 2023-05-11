@@ -181,6 +181,9 @@ pub use eeprom::Eeprom;
 #[cfg(feature = "mcu-atmega")]
 pub use usart::Usart;
 
+#[cfg(feature = "board-selected")]
+pub mod time;
+
 #[cfg(feature = "mcu-atmega")]
 pub mod prelude {
     pub use crate::hal::prelude::*;
