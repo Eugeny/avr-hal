@@ -41,7 +41,7 @@ macro_rules! impl_timepiece {
         $crate::hal::attach_timing_circuit_interrupt!{$TC; {
             // Increment the "millis" counter
             $crate::time::macros::interrupt_free(|cs| {
-                $crate::time::update_timer::<$crate::hal::HAL, $Name>(cs)
+                $crate::time::update_timer::<$crate::hal::HAL, $Name>(&cs)
             })
         }}
 
@@ -99,11 +99,11 @@ macro_rules! impl_timepiece {
                 (prescaler, cnt_top as _)
             };
 
-            fn access_millis(cs: &$crate::time::macros::CriticalSection) -> & $crate::time::macros::Cell<Self::Millis> {
+            fn access_millis<'a>(cs: &'a $crate::time::macros::CriticalSection) -> &'a $crate::time::macros::Cell<Self::Millis> {
                 // Counts proper milliseconds
                 static MILLIS_COUNTER: $crate::time::macros::Mutex<$crate::time::macros::Cell<$MILLIS>> = $crate::time::macros::Mutex::new($crate::time::macros::Cell::new(0));
 
-                MILLIS_COUNTER.borrow(cs)
+                MILLIS_COUNTER.borrow(*cs)
             }
 
             fn access_peripheral(&self) -> &Self::Circuit {

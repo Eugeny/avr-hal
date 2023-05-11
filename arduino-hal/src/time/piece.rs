@@ -38,7 +38,7 @@ pub unsafe trait Timepiece<H> {
     const TIMER_PARAMS: (Prescaler, <Self::Circuit as TimingCircuitOps<H>>::Counter);
 
     /// Reads the current value of the software milliseconds counter
-    fn access_millis(cs: &CriticalSection) -> &Cell<Self::Millis>;
+    fn access_millis<'a>(cs: &'a CriticalSection) -> &'a Cell<Self::Millis>;
 
     /// Gives access to the underling timer peripheral
     fn access_peripheral(&self) -> &Self::Circuit;

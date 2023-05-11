@@ -36,7 +36,7 @@ impl<H, Tp: Timepiece<H>> StaticChronometer<H, Tp> {
     /// return the last value, and the clock will appear frozen.
     pub fn millis(&self) -> Tp::Millis {
         // Get the current number of milliseconds
-        avr_device::interrupt::free(|cs| Tp::access_millis(cs).get())
+        avr_device::interrupt::free(|cs| Tp::access_millis(&cs).get())
     }
 }
 impl<H, Tp: Timepiece<H>> embedded_time::clock::Clock for StaticChronometer<H, Tp>
@@ -59,7 +59,7 @@ where
     Tp: Timepiece<H, Millis = u32>, // Just workaround until above gets accessible
 {
     pub fn now(&self) -> Instant<Self> {
-        avr_device::interrupt::free(|cs| self.now_with_cs(cs))
+        avr_device::interrupt::free(|cs| self.now_with_cs(&cs))
     }
 
     pub fn now_with_cs(&self, cs: &avr_device::interrupt::CriticalSection) -> Instant<Self> {
@@ -104,7 +104,7 @@ impl<H, Tp: Timepiece<H>> Chronometer<H, Tp> {
 
         // Reset the global millisecond counter
         avr_device::interrupt::free(|cs| {
-            Tp::access_millis(cs).set(0.into());
+            Tp::access_millis(&cs).set(0.into());
         });
 
         // Enable timer interrupt
@@ -133,19 +133,19 @@ impl<H, Tp: Timepiece<H>> Chronometer<H, Tp> {
 
     /// Reset the millis counter to zero, and return the old value
     pub fn reset_time(&self) {
-        avr_device::interrupt::free(|cs| Tp::access_millis(cs).replace(0.into()));
+        avr_device::interrupt::free(|cs| Tp::access_millis(&cs).replace(0.into()));
     }
 
     /// Returns the number of milliseconds since this clock was started
     pub fn millis(&self) -> Tp::Millis {
         // Get the current number of milliseconds
-        avr_device::interrupt::free(|cs| Tp::access_millis(cs).get())
+        avr_device::interrupt::free(|cs| Tp::access_millis(&cs).get())
     }
 
     /// Returns the number of microseconds since this clock was started
     pub fn micros(&self) -> Tp::Micros {
         let (mut m, t, tifr) = avr_device::interrupt::free(|cs| {
-            let m = Tp::access_millis(cs).get();
+            let m = Tp::access_millis(&cs).get();
 
             let tc = &self.inner.access_peripheral();
             let (t, tifr) = tc.read_counter();
@@ -197,7 +197,7 @@ where
     Tp: Timepiece<H, Micros = u32>, // Just workaround until above gets accessible
 {
     pub fn now(&self) -> Instant<Self> {
-        avr_device::interrupt::free(|cs| self.now_with_cs(cs))
+        avr_device::interrupt::free(|cs| self.now_with_cs(&cs))
     }
 
     pub fn now_with_cs(&self, cs: &avr_device::interrupt::CriticalSection) -> Instant<Self> {
