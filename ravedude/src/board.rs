@@ -12,6 +12,7 @@ pub fn get_board(board: &str) -> Option<Box<dyn Board>> {
         "uno" => Box::new(ArduinoUno),
         "nano" => Box::new(ArduinoNano),
         "nano-new" => Box::new(ArduinoNanoNew),
+        "micro" => Box::new(ArduinoMicro),
         "leonardo" => Box::new(ArduinoLeonardo),
         "micro" => Box::new(ArduinoMicro),
         "mega2560" => Box::new(ArduinoMega2560),
@@ -156,6 +157,31 @@ impl Board for ArduinoNanoNew {
 
     fn guess_port(&self) -> Option<anyhow::Result<std::path::PathBuf>> {
         Some(Err(anyhow::anyhow!("Not able to guess port")))
+    }
+}
+
+struct ArduinoMicro;
+
+impl Board for ArduinoMicro {
+    fn display_name(&self) -> &str {
+        "Arduino Micro"
+    }
+
+    fn needs_reset(&self) -> bool {
+        false
+    }
+
+    fn avrdude_options(&self) -> avrdude::AvrdudeOptions {
+        avrdude::AvrdudeOptions {
+            programmer: "avr109",
+            partno: "atmega32u4",
+            baudrate: Some(57600),
+            do_chip_erase: true,
+        }
+    }
+
+    fn guess_port(&self) -> Option<std::path::PathBuf> {
+        None
     }
 }
 

@@ -43,3 +43,8 @@ pub use trinket_pro::*;
 mod trinket;
 #[cfg(feature = "trinket")]
 pub use trinket::*;
+
+#[cfg(feature = "arduino-micro")]
+mod micro;
+#[cfg(feature = "arduino-micro")]
+pub use micro::*;
